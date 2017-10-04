@@ -1,0 +1,11 @@
+E:/git/CocktailAmpel/cmake-build-debug/CMakeFiles/PLATFORMIO_UPLOADFS.dir
+E:/git/CocktailAmpel/cmake-build-debug/CMakeFiles/PLATFORMIO_BUILD.dir
+E:/git/CocktailAmpel/cmake-build-debug/CMakeFiles/CocktailAmpel.dir
+E:/git/CocktailAmpel/cmake-build-debug/CMakeFiles/PLATFORMIO_UPLOAD.dir
+E:/git/CocktailAmpel/cmake-build-debug/CMakeFiles/PLATFORMIO_CLEAN.dir
+E:/git/CocktailAmpel/cmake-build-debug/CMakeFiles/PLATFORMIO_REBUILD_PROJECT_INDEX.dir
+E:/git/CocktailAmpel/cmake-build-debug/CMakeFiles/PLATFORMIO_TEST.dir
+E:/git/CocktailAmpel/cmake-build-debug/CMakeFiles/PLATFORMIO_PROGRAM.dir
+E:/git/CocktailAmpel/cmake-build-debug/CMakeFiles/PLATFORMIO_UPDATE_ALL.dir
+E:/git/CocktailAmpel/cmake-build-debug/CMakeFiles/edit_cache.dir
+E:/git/CocktailAmpel/cmake-build-debug/CMakeFiles/rebuild_cache.dir
