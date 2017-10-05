@@ -32,80 +32,47 @@ DMXESPSerial dmx;
 uint8_t state = 0;
 uint8_t dimmer_values[] = {0,0,0};
 volatile bool ticked = false;
-
+volatile uint8_t runcount = 0;
+volatile uint8_t update = 0;
 
 void timer_tick() {
     ticked = true;
+    if(state == STATE_RANDOM_STARTED) {
+        runcount++;
+    }
+
 }
 
 
-void update_dmx() {
-    switch(state) {
+void update_dimmer() {
+    uint8_t rand = random(0,3);
+    Serial.print("Lighting Lamp");
+    Serial.print(rand);
+    Serial.println("");
+    for(int i = 0; i < 3; i ++ ) {
+        if(i == rand) {
+            dimmer_values[i] = 255;
 
-        case 0: {   //State Chase. Just a random Chase.
-
-            //timer.attach(1,timer_tick);
-            //uint8_t rand = ESP8266TrueRandom.random(1, 4);
-            uint8_t rand = 1;
-            Serial.println();
-            Serial.print("Updating DMX. Lighting Lamp:");
-            Serial.print(rand);
-            Serial.println();
-            for(int i = 1; i < 4; i++) {
-                if(i == rand) {
-                    dmx.write(rand, 255);
-                } else {
-                    dmx.write(i, 0);
-                }
-            }
-            Serial.println("Mark 2");
-            dmx.update();
+        } else {
+            dimmer_values[i] = 0;
         }
-
-        case 1: {
-            timer.attach(0.2,timer_tick);
-            uint8_t rand = ESP8266TrueRandom.random(1, 4);
-            for(int i = 1; i < 4; i++) {
-                if(i == rand) {
-                    dmx.write(rand, 255);
-                } else {
-                    dmx.write(i, 0);
-                }
-            }
-        }
-
-        case 2: {
-            for(int j = 0; j < 5; j++) {
-
-                uint8_t rand = ESP8266TrueRandom.random(1, 4);
-
-                for(int i = 1; i < 4; i++) {
-                    if(i == rand) {
-                        dmx.write(rand, 255);
-                    } else {
-                        dmx.write(i, 0);
-                    }
-                }
-
-                timer.attach(0.2+(j*0.1),timer_tick);
-            }
-            timer.attach(10, timer_tick);
-        }
-
     }
-    Serial.println("Mark 3");
-
 }
 
 
 void ISR_button_pressed() {
     Serial.println("Button pressed");
-    if(state == 0) {
-        state = 1;
-    } else if(state == 1){
-        state = 2;
+    if(state == STATE_CHASE) {
+        state = STATE_RANDOM_STARTED;
+        update = 1;
     }
+    if(state == STATE_RANDOM_STARTED){
+        state = STATE_BUTTON_PRESSED;
+        update = 1;
+    }
+    return;
 }
+
 
 
 
@@ -129,7 +96,7 @@ void setup() {
     Serial.printf("HTTPUpdateServer ready! Open http://%s.local%s in your browser and login with username '%s' and password '%s'\n", host, update_path, update_username, update_password);
 
     pinMode(D7, INPUT_PULLUP);
-    timer.attach(0.5, timer_tick);
+    timer.attach(2, timer_tick);
 
     attachInterrupt(PIN_BUTTON, ISR_button_pressed, FALLING);
     Serial.println();
@@ -144,9 +111,35 @@ void setup() {
 // the loop function runs over and over again forever
 void loop() {
     httpServer.handleClient();
+    if(state == STATE_CHASE && update && ticked) {
+        timer.attach(2, timer_tick);
+        update = 0;
+    }
+
+    if(state == STATE_RANDOM_STARTED && update) {
+        timer.attach(0.2, timer_tick);
+        update = 0;
+
+    }
+    if(state == STATE_BUTTON_PRESSED && update && ticked) {
+        timer.attach(0.2+runcount/10, timer_tick);
+        runcount++;
+        if(runcount == 6) {
+            timer.attach(5, timer_tick);
+            update = 1;
+        }
+    }
+
+
     if(ticked){
-        Serial.println("lol2");
-        update_dmx();
+        Serial.println(state);
+        update_dimmer();
         ticked = false;
     }
+
+
+    for(int i = 1; i < 4; i++) {
+        dmx.write(i, dimmer_values[i-1]);
+    }
+    dmx.update();
 }
