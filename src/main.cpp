@@ -127,6 +127,7 @@ void loop() {
         if(runcount == 6) {
             timer.attach(5, timer_tick);
             update = 1;
+            runcount = 0;
         }
     }
 
